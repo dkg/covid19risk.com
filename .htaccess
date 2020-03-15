@@ -1,0 +1,6 @@
+RewriteEngine On 
+RewriteCond %{SERVER_PORT} 80
+RewriteCond %{HTTP_HOST} ^(www\.)?covid19risk\.com
+RewriteRule ^(.*)$ https://www.covid19risk.com/$1 [R,L]
+
+
