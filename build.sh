@@ -1,26 +1,44 @@
 #!/bin/bash
 
-BUCKETNAME=covidwatch
-FOLDERNAME=
-CLOUDFRONT_INVALIDATION_ID=E3DTRHAKABXKO3
-
-AWSPROFILE=$1
-NOBUILD=$2
+LIVE_OR_STAGING=$1
+AWSPROFILE=$2
 
 argquit() {
   echo "Please run this script from the root development folder of the nuxt app."
   echo "Syntax: "
-  echo "    ./build.sh <awsprofile>"
+  echo "    ./build.sh [live|staging] <awsprofile>"
+  echo ""
+  echo "    live|staging: pick whether to deploy to live or staging"
   echo ""
   echo "    awsprofile: The name of your AWS profile. It should correspond to"
   echo "                a set of credentials in your ~/.aws/credentials"
   echo "                and config in ~/.aws/config files."
   echo ""
-  echo "    nobuild: Specify this second argument if you have already performed"
-  echo "             \`npm run generate\` and you just want to copy to S3."
   exit 1
 }
+BUCKETNAME=
 
+if [ -z "$LIVE_OR_STAGING" ]; then
+  echo "ERROR: live|staging not selected"
+  echo ""
+  argquit
+fi
+
+if [ "$LIVE_OR_STAGING" = "live" ]; then
+  BUCKETNAME=covidwatch
+  CLOUDFRONT_INVALIDATION_ID=E3DTRHAKABXKO3
+fi
+
+if [ "$LIVE_OR_STAGING" = "staging" ]; then
+  BUCKETNAME=covidwatch-staging
+  CLOUDFRONT_INVALIDATION_ID=ERB7Y0Z7SNYIM
+fi
+
+if [ -z "$BUCKETNAME" ]; then
+  echo "ERROR: $LIVE_OR_STAGING is neither live nor staging"
+  echo ""
+  argquit
+fi
 
 if [ -z "$AWSPROFILE" ]; then
   echo "ERROR: <awsprofile> not provided."
